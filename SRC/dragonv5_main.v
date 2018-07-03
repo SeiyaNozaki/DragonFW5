@@ -182,7 +182,11 @@ module dragonv5_main(
 			 BP_EXTCLK_N,
 			 BP_BUSY_P,
 			 BP_BUSY_N,
-			 BP_FPGA_PROGRAM
+			 BP_FPGA_PROGRAM,
+ 			 BP_JTAG_TCK, 
+			 BP_JTAG_TDI, 
+			 BP_JTAG_TMS, 
+			 BP_JTAG_TDO  
 			 
 		 );
 	 
@@ -350,6 +354,10 @@ module dragonv5_main(
 	output BP_BUSY_P;
 	output BP_BUSY_N;
 	output BP_FPGA_PROGRAM;
+	output BP_JTAG_TCK; 
+	output BP_JTAG_TDI; 
+	output BP_JTAG_TMS; 
+	input  BP_JTAG_TDO;
 	
 //--------------------------------------------
 //genvar 
@@ -2523,13 +2531,20 @@ module dragonv5_main(
 	wire[7:0] RAM_RBCP_RD;
 	wire CS_M25P16_IF;
 	wire SPI_PROGRAM;
+	wire[7:0] BPJTAG_RBCP_RD;
+	wire BPJTAG_RBCP_ACT;
+	wire BPJTAG_RBCP_ACK;
 
-	assign RBCP_ACK = SPI_RBCP_ACK | RAM_RBCP_ACK;
+	assign RBCP_ACK = SPI_RBCP_ACK | RAM_RBCP_ACK | BPJTAG_RBCP_ACK;
+	//assign RBCP_ACK = SPI_RBCP_ACK | RAM_RBCP_ACK;
 	assign RBCP_RD[7:0] = (SPI_RBCP_ACK ? SPI_RBCP_RD[7:0] : RAM_RBCP_RD[7:0]);
 	assign SPI_PROGRAM_B = ~SPI_PROGRAM;
+	
 	assign CS_M25P16_IF   = (RBCP_ADDR[31:12]==20'd0);
 	assign SPI_RBCP_ACT = (RBCP_ACT & CS_M25P16_IF);
-	assign RAM_RBCP_ACT = (RBCP_ACT & ~CS_M25P16_IF);
+	//assign RAM_RBCP_ACT = (RBCP_ACT & ~CS_M25P16_IF);
+	assign RAM_RBCP_ACT = (RBCP_ACT & (RBCP_ADDR[31:12]==20'd1));    
+	assign BPJTAG_RBCP_ACT = (RBCP_ACT & (RBCP_ADDR[31:12]==20'd2)); 
 
 	SPI_IF_drs spi_if_drs(
 		.CLK           (clk_133m           ), // in : Clock
@@ -3139,5 +3154,30 @@ module dragonv5_main(
 	assign SCB_TP_TRIG_WIDTH[15:0] = {XCB[7:0],XCC[7:0]};
 	assign TRIGGER_FREQ_OFFSET[15:0] = {XCD[7:0],XCE[7:0]};
 	assign SCB_TP_CLKSELECT[7:0] = {XCF[7:0]};
+	
+	//--------------------------------------------
+	//BP FPGA firmware reconfiguration
+
+	
+	BP_reconfiguration bp_reconfiguration(
+		.CLK_133m(clk_133m),	// in	: System clock
+		.CLK_66m(clk),
+		.RST(rst),	// in	: System reset
+		
+		//BP JTAG I/F
+		.JTAG_TCK(BP_JTAG_TCK),
+		.JTAG_TMS(BP_JTAG_TMS),
+		.JTAG_TDI(BP_JTAG_TDI),
+		.JTAG_TDO(BP_JTAG_TDO),
+		
+		// RBCP I/F
+		.RBCP_ACT(BPJTAG_RBCP_ACT),	// in	: Active
+		.RBCP_ADDR(RBCP_ADDR[31:0]),	// in	: Address[31:0]
+		.RBCP_WE(RBCP_WE),	// in	: Write enable
+		.RBCP_WD(RBCP_WD[7:0]),	// in	: Write data[7:0]
+		.RBCP_RE(RBCP_RE),	// in	: read enable
+		.RBCP_RD(BPJTAG_RBCP_RD[7:0] ), // out   : Read data[7:0]
+		.RBCP_ACK(BPJTAG_RBCP_ACK)	// out	: Acknowledge
+	);
 
 endmodule
