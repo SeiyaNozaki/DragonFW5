@@ -1673,9 +1673,14 @@ module dragonv5_main(
 	wire DRS_DWRITE_asyncen;
 	reg DRS_DWRITE_async;
 	reg rDRS_DWRITE;
+	reg rst_DRS_DWRITE_async_reg;
+	reg DRS_DWRITE_asyncen_reg;
 
-	assign rst_DRS_DWRITE_async = ~( drs_state==4'd4 || drs_state==4'd7 || drs_state==4'd5 );
-	assign DRS_DWRITE_asyncen = ( (drs_state==4'd4 || drs_state==4'd7) && ( TRIGGER_SELECT==8'd0 || TRIGGER_SELECT==8'd3 ) );
+	assign rst_DRS_DWRITE_async = rst_DRS_DWRITE_async_reg;
+	//assign rst_DRS_DWRITE_async = ~( drs_state==4'd4 || drs_state==4'd7 || drs_state==4'd5 ); //20180703(for solving "0 problem")
+ 
+	assign DRS_DWRITE_asyncen = DRS_DWRITE_asyncen_reg;	
+	//assign DRS_DWRITE_asyncen = (	(drs_state==4'd4 || drs_state==4'd7) && ( TRIGGER_SELECT==8'd0 || TRIGGER_SELECT==8'd3 ) ); //20180703//20180703(for solving "0 problem")
 	//assign DRS_DWRITE_asyncen = ( (drs_state==4'd4 || drs_state==4'd7) && ( TRIGGER_SELECT==8'd0 || TRIGGER_SELECT==8'd3 || TRIGGER_SELECT==8'd8 ) );
 	assign DRS_DWRITE = (DRS_DWRITE_asyncen ? DRS_DWRITE_async : rDRS_DWRITE);
 	//assign DRS_DWRITE = rDRS_DWRITE;
@@ -1695,8 +1700,13 @@ module dragonv5_main(
 			rDRS_DWRITE <= 1'b0;
 			drs_dwrite_c <= 13'd0;
 		end else begin
+
+			rst_DRS_DWRITE_async_reg <= ~( drs_state==4'd4 || drs_state==4'd7 || drs_state==4'd5 ); 
+			DRS_DWRITE_asyncen_reg <= ( (drs_state==4'd4 || drs_state==4'd7) && ( TRIGGER_SELECT==8'd0 || TRIGGER_SELECT==8'd3 ) ); 
+
 			case(drs_state)
-				
+
+			
 				4'd3:begin
 					rDRS_DWRITE <= 1'b1;
 					drs_dwrite_c <= 13'd0;
