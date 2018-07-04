@@ -12,7 +12,7 @@
 `define TESTBP
 
 	`define FIRMWARE_VER 16'h53_00
-	`define FIRMWARE_SUBVER 6'h03
+	`define FIRMWARE_SUBVER 6'h04
 `ifdef ANALOG_TRIG
 	`define FIRMWARE_TRIGGER 2'b00
 `endif
@@ -2381,7 +2381,7 @@ module dragonv5_main(
 	//assign adc_dat[95:0] = 96'h888777666555444333222111;
 
 
-	//wire[31:0] drs_state_ind;
+	wire[31:0] drs_state_ind;
 	//wire[111:0] drs_c_ind;
 	generate
 		for(i=0;i<8;i=i+1) begin : DRS_READ_GEN
@@ -2414,9 +2414,9 @@ module dragonv5_main(
 				.DFIFO_DOUT(dfifo_dout[8*i+7:8*i]),
 				.DFIFO_EMPTY(dfifo_empty[i]),
 				.DFIFO_VALID(dfifo_valid[i]),
-				.DFIFO_PROGFULLOUT(dfifo_progfull[i])
+				.DFIFO_PROGFULLOUT(dfifo_progfull[i]),
 
-				//.drs_state(drs_state_ind[4*i+3:4*i]),
+				.drs_state(drs_state_ind[4*i+3:4*i])
 				//.drs_c(drs_c_ind[14*i+13:14*i])
 			);
 
@@ -3051,8 +3051,12 @@ module dragonv5_main(
 	assign X02 = FIRMWARE_SUBVER;
 	assign X03 = DIP_SWITCH_READ;
 	assign {X04,X05,X06,X07} = DEBUG_IN[31:0];
+	assign DEBUG_IN[31:24] = {rst_fromextclklocked, DRS_PLLLCK, TCP_OPEN, TCP_TX_FULL, adc_buffifo_empty, adc_buffifo_full, cfifo_empty, cfifo_progfull};
+	assign DEBUG_IN[23:16] = dfifo_empty[7:0];
+	assign DEBUG_IN[15:8] = dfifo_progfull[7:0];
+	assign DEBUG_IN[7:0] = {drs_state[3:0], drs_state_ind[3:0]};
 	//assign DEBUG_IN[31:0] = {8'd0,5'd0,drs_c[10:0],4'd0,drs_state[3:0]};
-	assign DEBUG_IN[31:0] = {dfifo_empty[7:0],7'd0,cfifo_empty,7'd0,sfifo_empty,4'd0,drs_state[3:0]};
+	//assign DEBUG_IN[31:0] = {dfifo_empty[7:0],7'd0,cfifo_empty,7'd0,sfifo_empty,4'd0,drs_state[3:0]};
 	//assign DEBUG_IN[31:0] = {inddrs_read_done[7:0],drs_c_ind[13:0],4'd0,drs_state_ind[3:0]};
 
 	assign command_rst = (X08 == 8'hFF);

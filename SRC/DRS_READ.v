@@ -30,9 +30,9 @@ module DRS_READ
 	output[7:0] DFIFO_DOUT,
 	output DFIFO_EMPTY,
 	output DFIFO_VALID,
-	output DFIFO_PROGFULLOUT
+	output DFIFO_PROGFULLOUT,
 
-	//output[3:0] drs_state,
+	output[3:0] drs_state
 	//output[13:0] drs_c
 );
 
