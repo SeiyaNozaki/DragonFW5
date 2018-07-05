@@ -2459,6 +2459,7 @@ module dragonv5_main(
 	wire sfifo_rden;
 	wire sfifo_empty;
 	wire sfifo_progfull;
+	wire[13:0] sfifo_wr_count;
 	assign sfifo_rden = ~sfifo_empty & ~TCP_TX_FULL & TCP_OPEN;
 
 	DATA_FORMATTER data_formatter
@@ -2495,8 +2496,9 @@ module dragonv5_main(
 		//.SFIFO_DOUT(), //adc_buffifo->SiTCP test
 		.SFIFO_EMPTY(sfifo_empty),
 		.SFIFO_PROGFULL(sfifo_progfull),
-		.SFIFO_VALID(TCP_TX_WR)
+		.SFIFO_VALID(TCP_TX_WR),
 		//.SFIFO_VALID() //adc_buffifo->SiTCP test
+		.SFIFO_WR_COUNT(sfifo_wr_count[13:0])
 	);
 
 //--------------------------------------------
@@ -2798,6 +2800,29 @@ module dragonv5_main(
 	wire[7:0] XCE;
 	wire[7:0] XCF;
 
+	wire[7:0] XE0;
+	wire[7:0] XE1;
+	wire[7:0] XE2;
+	wire[7:0] XE3;
+	wire[7:0] XE4;
+	wire[7:0] XE5;
+	wire[7:0] XE6;
+	wire[7:0] XE7;
+	wire[7:0] XE8;
+	wire[7:0] XE9;
+	wire[7:0] XEA;
+	wire[7:0] XEB;
+	wire[7:0] XEC;
+	wire[7:0] XED;
+	wire[7:0] XEE;
+	wire[7:0] XEF;
+	
+	wire[7:0] XF0;
+	wire[7:0] XF1;
+	wire[7:0] XF2;
+	wire[7:0] XF3;
+		
+	
 	RBCP_REG_drs rbcp_reg(
 		.CLK(clk_133m),	// in	: System clock
 		.RST(rst),	// in	: System reset
@@ -3049,7 +3074,29 @@ module dragonv5_main(
 		.XCCData(XCC[7:0]), 
 		.XCDData(XCD[7:0]), 
 		.XCEData(XCE[7:0]), 
-		.XCFData(XCF[7:0])
+		.XCFData(XCF[7:0]),
+		
+		.XE0Data(XE0[7:0]), //in
+		.XE1Data(XE1[7:0]), //in
+		.XE2Data(XE2[7:0]), //in
+		.XE3Data(XE3[7:0]), //in
+		.XE4Data(XE4[7:0]), //in
+		.XE5Data(XE5[7:0]), //in
+		.XE6Data(XE6[7:0]), //in
+		.XE7Data(XE7[7:0]), //in
+		.XE8Data(XE8[7:0]), //in
+		.XE9Data(XE9[7:0]), //in
+		.XEAData(XEA[7:0]), //in
+		.XEBData(XEB[7:0]), //in
+		.XECData(XEC[7:0]), //in
+		.XEDData(XED[7:0]), //in 
+		.XEEData(XEE[7:0]), //in
+		.XEFData(XEF[7:0]), //in
+		
+		.XF0Data(XF0[7:0]), //in
+		.XF1Data(XF1[7:0]), //in
+		.XF2Data(XF2[7:0]), //in
+		.XF3Data(XF3[7:0])  //in
 	);
 
 	assign {X00,X01} = FIRMWARE_VER;
@@ -3164,6 +3211,19 @@ module dragonv5_main(
 	assign TRIGGER_FREQ_OFFSET[15:0] = {XCD[7:0],XCE[7:0]};
 	assign SCB_TP_CLKSELECT[7:0] = {XCF[7:0]};
 	
+	assign {XE1[7:0], XE0[7:0]} = {3'd0, dfifo_wr_count[12:0]};
+	assign {XE3[7:0], XE2[7:0]} = {3'd0, dfifo_wr_count[25:13]};
+	assign {XE5[7:0], XE4[7:0]} = {3'd0, dfifo_wr_count[38:26]};
+	assign {XE7[7:0], XE6[7:0]} = {3'd0, dfifo_wr_count[51:39]};
+	assign {XE9[7:0], XE8[7:0]} = {3'd0, dfifo_wr_count[64:52]};
+	assign {XEB[7:0], XEA[7:0]} = {3'd0, dfifo_wr_count[77:65]};
+	assign {XED[7:0], XEC[7:0]} = {3'd0, dfifo_wr_count[90:78]};
+	assign {XEF[7:0], XEE[7:0]} = {3'd0, dfifo_wr_count[103:91]};
+	
+	assign {XF1[7:0], XF0[7:0]} = {6'd0, cfifo_wr_count[9:0]};
+	assign {XF3[7:0], XF2[7:0]} = {2'd0, sfifo_wr_count[13:0]};
+
+
 	//--------------------------------------------
 	//BP FPGA firmware reconfiguration
 

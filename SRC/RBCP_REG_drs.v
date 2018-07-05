@@ -288,7 +288,29 @@ module RBCP_REG_drs(
 	XCCData,
 	XCDData,
 	XCEData,
-	XCFData
+	XCFData,
+	
+	XE0Data,
+	XE1Data,
+	XE2Data,
+	XE3Data,
+	XE4Data,
+	XE5Data,
+	XE6Data,
+	XE7Data,
+	XE8Data,
+	XE9Data,
+	XEAData,
+	XEBData,
+	XECData,
+	XEDData,
+	XEEData,
+	XEFData,
+	
+	XF0Data,
+	XF1Data,
+	XF2Data,
+	XF3Data
 );
 
 //-------- Input/Output -------------
@@ -542,6 +564,29 @@ module RBCP_REG_drs(
 	output[7:0] XCDData;
 	output[7:0] XCEData;
 	output[7:0] XCFData;
+	
+	input[7:0] XE0Data;
+	input[7:0] XE1Data;
+	input[7:0] XE2Data;
+	input[7:0] XE3Data;
+	input[7:0] XE4Data;
+	input[7:0] XE5Data;
+	input[7:0] XE6Data;
+	input[7:0] XE7Data;
+	input[7:0] XE8Data;
+	input[7:0] XE9Data;
+	input[7:0] XEAData;
+	input[7:0] XEBData;
+	input[7:0] XECData;
+	input[7:0] XEDData;
+	input[7:0] XEEData;
+	input[7:0] XEFData;
+
+	input[7:0] XF0Data;
+	input[7:0] XF1Data;
+	input[7:0] XF2Data;
+	input[7:0] XF3Data;
+
 
 //------------------------------------------------------------------------------
 //	Control
@@ -1929,7 +1974,29 @@ module RBCP_REG_drs(
 	wire[7:0] XCDData;
 	wire[7:0] XCEData;
 	wire[7:0] XCFData;
+	
+	wire[7:0] XE0Data;
+	wire[7:0] XE1Data;
+	wire[7:0] XE2Data;
+	wire[7:0] XE3Data;
+	wire[7:0] XE4Data;
+	wire[7:0] XE5Data;
+	wire[7:0] XE6Data;
+	wire[7:0] XE7Data;
+	wire[7:0] XE8Data;
+	wire[7:0] XE9Data;
+	wire[7:0] XEAData;
+	wire[7:0] XEBData;
+	wire[7:0] XECData;
+	wire[7:0] XEDData;
+	wire[7:0] XEEData;
+	wire[7:0] XEFData;
 
+	wire[7:0] XF0Data;
+	wire[7:0] XF1Data;
+	wire[7:0] XF2Data;	
+	wire[7:0] XF3Data;
+	
 	assign X08Data[7:0] = regX08Data[7:0];
 	assign X09Data[7:0] = regX09Data[7:0];
 	assign X0AData[7:0] = regX0AData[7:0];
@@ -2370,6 +2437,29 @@ module RBCP_REG_drs(
 			8'hCD:   muxRegDataA[7:0] <= XCDData[7:0];
 			8'hCE:   muxRegDataA[7:0] <= XCEData[7:0];
 			8'hCF:   muxRegDataA[7:0] <= XCFData[7:0];
+			
+			8'hE0:   muxRegDataA[7:0] <= XE0Data[7:0];
+			8'hE1:   muxRegDataA[7:0] <= XE1Data[7:0];
+			8'hE2:   muxRegDataA[7:0] <= XE2Data[7:0];
+			8'hE3:   muxRegDataA[7:0] <= XE3Data[7:0];
+			8'hE4:   muxRegDataA[7:0] <= XE4Data[7:0];
+			8'hE5:   muxRegDataA[7:0] <= XE5Data[7:0];
+			8'hE6:   muxRegDataA[7:0] <= XE6Data[7:0];
+			8'hE7:   muxRegDataA[7:0] <= XE7Data[7:0];
+			8'hE8:   muxRegDataA[7:0] <= XE8Data[7:0];
+			8'hE9:   muxRegDataA[7:0] <= XE9Data[7:0];
+			8'hEA:   muxRegDataA[7:0] <= XEAData[7:0];
+			8'hEB:   muxRegDataA[7:0] <= XEBData[7:0];
+			8'hEC:   muxRegDataA[7:0] <= XECData[7:0];
+			8'hED:   muxRegDataA[7:0] <= XEDData[7:0];
+			8'hEE:   muxRegDataA[7:0] <= XEEData[7:0];
+			8'hEF:   muxRegDataA[7:0] <= XEFData[7:0];
+			
+			8'hF0:   muxRegDataA[7:0] <= XF0Data[7:0];
+			8'hF1:   muxRegDataA[7:0] <= XF1Data[7:0];
+			8'hF2:   muxRegDataA[7:0] <= XF2Data[7:0];
+			8'hF3:   muxRegDataA[7:0] <= XF3Data[7:0];
+			
 			
 			default:muxRegDataA[7:0] <= X00Data[7:0];
 		endcase
