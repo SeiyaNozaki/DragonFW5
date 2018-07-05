@@ -22,6 +22,7 @@ module COUNTER_READ
 	output[7:0] CFIFO_DOUT,
 	output CFIFO_EMPTY,
 	output CFIFO_VALID,
+	output[9:0] CFIFO_WR_COUNT,
 	output CFIFO_PROGFULL
 );
 
@@ -53,6 +54,7 @@ module COUNTER_READ
 		.empty(),
 		.almost_empty(CFIFO_EMPTY),
 		.valid(CFIFO_VALID),
+		.wr_data_count(CFIFO_WR_COUNT[9:0]),
 		.prog_full(fifoprogfull)
 	);
 

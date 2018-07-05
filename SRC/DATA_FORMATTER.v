@@ -32,7 +32,8 @@ module DATA_FORMATTER
 	output[7:0] SFIFO_DOUT,
 	output SFIFO_EMPTY,
 	output SFIFO_PROGFULL,
-	output SFIFO_VALID
+	output SFIFO_VALID,
+	output[13:0] SFIFO_WR_COUNT
 );
 
 //--------------------------------------------
@@ -544,6 +545,7 @@ module DATA_FORMATTER
 		.full(),
 		.empty(SFIFO_EMPTY),
 		.valid(SFIFO_VALID),
+		.wr_data_count(SFIFO_WR_COUNT[13:0]),
 		.prog_full(sfifo_progfull)
 	);
 

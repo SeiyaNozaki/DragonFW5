@@ -30,6 +30,7 @@ module DRS_READ
 	output[7:0] DFIFO_DOUT,
 	output DFIFO_EMPTY,
 	output DFIFO_VALID,
+	output[13:0] DFIFO_WR_COUNT,
 	output DFIFO_PROGFULLOUT,
 
 	output[3:0] drs_state
@@ -109,6 +110,7 @@ module DRS_READ
 		.empty(),
 		.almost_empty(DFIFO_EMPTY),
 		.valid(DFIFO_VALID),
+		.wr_data_count(DFIFO_WR_COUNT[13:0]),
 		.prog_full(DFIFO_PROGFULLOUT)
 	);
 	assign dfifo_progfull = DFIFO_PROGFULLOUT;

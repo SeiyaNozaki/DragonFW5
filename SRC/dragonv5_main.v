@@ -2380,7 +2380,7 @@ module dragonv5_main(
 
 	//assign adc_dat[95:0] = 96'h888777666555444333222111;
 
-
+	wire[103:0] dfifo_wr_count; 
 	wire[31:0] drs_state_ind;
 	//wire[111:0] drs_c_ind;
 	generate
@@ -2414,6 +2414,7 @@ module dragonv5_main(
 				.DFIFO_DOUT(dfifo_dout[8*i+7:8*i]),
 				.DFIFO_EMPTY(dfifo_empty[i]),
 				.DFIFO_VALID(dfifo_valid[i]),
+				.DFIFO_WR_COUNT(dfifo_wr_count[13*i+12:13*i]),
 				.DFIFO_PROGFULLOUT(dfifo_progfull[i]),
 
 				.drs_state(drs_state_ind[4*i+3:4*i])
@@ -2428,6 +2429,7 @@ module dragonv5_main(
 	wire[7:0] cfifo_dout;
 	wire cfifo_empty;
 	wire cfifo_valid;
+	wire[9:0] cfifo_wr_count;
 	wire cfifo_progfull;
 	assign drs_cfifo_progfull = cfifo_progfull;
 
@@ -2450,6 +2452,7 @@ module dragonv5_main(
 		.CFIFO_DOUT(cfifo_dout[7:0]),
 		.CFIFO_EMPTY(cfifo_empty),
 		.CFIFO_VALID(cfifo_valid),
+		.CFIFO_WR_COUNT(cfifo_wr_count[9:0]),
 		.CFIFO_PROGFULL(cfifo_progfull)
 	);
 

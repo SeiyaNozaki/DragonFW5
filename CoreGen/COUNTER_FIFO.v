@@ -49,6 +49,7 @@ module COUNTER_FIFO(
   empty,
   almost_empty,
   valid,
+  wr_data_count,
   prog_full
 );
 
@@ -64,6 +65,7 @@ output full;
 output empty;
 output almost_empty;
 output valid;
+output [9 : 0] wr_data_count;
 output prog_full;
 
 // synthesis translate_off
@@ -159,7 +161,7 @@ output prog_full;
     .C_HAS_UNDERFLOW(0),
     .C_HAS_VALID(1),
     .C_HAS_WR_ACK(0),
-    .C_HAS_WR_DATA_COUNT(0),
+    .C_HAS_WR_DATA_COUNT(1),
     .C_HAS_WR_RST(0),
     .C_IMPLEMENTATION_TYPE(2),
     .C_IMPLEMENTATION_TYPE_AXIS(1),
@@ -272,6 +274,7 @@ output prog_full;
     .EMPTY(empty),
     .ALMOST_EMPTY(almost_empty),
     .VALID(valid),
+    .WR_DATA_COUNT(wr_data_count),
     .PROG_FULL(prog_full),
     .BACKUP(),
     .BACKUP_MARKER(),
@@ -293,7 +296,6 @@ output prog_full;
     .UNDERFLOW(),
     .DATA_COUNT(),
     .RD_DATA_COUNT(),
-    .WR_DATA_COUNT(),
     .PROG_EMPTY(),
     .SBITERR(),
     .DBITERR(),
