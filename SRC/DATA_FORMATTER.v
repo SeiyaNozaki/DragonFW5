@@ -31,6 +31,7 @@ module DATA_FORMATTER
 	input SFIFO_RDEN,
 	output[7:0] SFIFO_DOUT,
 	output SFIFO_EMPTY,
+	output SFIFO_PROGFULL,
 	output SFIFO_VALID
 );
 
@@ -529,6 +530,8 @@ module DATA_FORMATTER
 
 	wire[13:0] sfifo_pflthresh;
 	assign sfifo_pflthresh = 14'd16383 - 14'd6;
+	assign SFIFO_PROGFULL = sfifo_progfull;
+	
 	FORMAT_FIFO format_fifo(
 		.rst(RST),
 		.wr_clk(sfifo_wrclk),

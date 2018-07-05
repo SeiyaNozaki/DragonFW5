@@ -2455,6 +2455,7 @@ module dragonv5_main(
 
 	wire sfifo_rden;
 	wire sfifo_empty;
+	wire sfifo_progfull;
 	assign sfifo_rden = ~sfifo_empty & ~TCP_TX_FULL & TCP_OPEN;
 
 	DATA_FORMATTER data_formatter
@@ -2490,6 +2491,7 @@ module dragonv5_main(
 		.SFIFO_DOUT(TCP_TX_DATA[7:0]),
 		//.SFIFO_DOUT(), //adc_buffifo->SiTCP test
 		.SFIFO_EMPTY(sfifo_empty),
+		.SFIFO_PROGFULL(sfifo_progfull),
 		.SFIFO_VALID(TCP_TX_WR)
 		//.SFIFO_VALID() //adc_buffifo->SiTCP test
 	);
@@ -3051,7 +3053,7 @@ module dragonv5_main(
 	assign X02 = FIRMWARE_SUBVER;
 	assign X03 = DIP_SWITCH_READ;
 	assign {X04,X05,X06,X07} = DEBUG_IN[31:0];
-	assign DEBUG_IN[31:24] = {rst_fromextclklocked, DRS_PLLLCK, TCP_OPEN, TCP_TX_FULL, adc_buffifo_empty, adc_buffifo_full, cfifo_empty, cfifo_progfull};
+	assign DEBUG_IN[31:24] = {rst_fromextclklocked, DRS_PLLLCK, TCP_TX_FULL, adc_buffifo_empty, adc_buffifo_full, cfifo_empty, cfifo_progfull, sfifo_progfull};
 	assign DEBUG_IN[23:16] = dfifo_empty[7:0];
 	assign DEBUG_IN[15:8] = dfifo_progfull[7:0];
 	assign DEBUG_IN[7:0] = {drs_state[3:0], drs_state_ind[3:0]};
@@ -3071,7 +3073,7 @@ module dragonv5_main(
 	assign ADC_SPI_ADDR = {X12[4:0],X13[7:0]};
 
 	assign TRIGGER_ENABLE = X1E[0];
-	assign X1F[7:0] = {7'd0,BUSY_STATE};
+	assign X1F[7:0] = {6'd0, TCP_OPEN, BUSY_STATE};
 
 	assign command_dtrigset = (X20 == 8'hFF);
 	assign DTRIG_THRESHOLD_0 = X21[7:0];
