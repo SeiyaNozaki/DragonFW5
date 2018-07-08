@@ -1103,9 +1103,9 @@ module dragonv5_main(
 //SiTCP module
 	wire SiTCP_RST; //reset out from SiTCP
 	wire force_default_sw;
-	wire command_sitcprst; //command for reset to SiTCP
+	wire command_sitcprst_sync; //command for reset to SiTCP
 	wire rst_sitcp; 
-	assign rst_sitcp = rst || command_sitcprst;
+	assign rst_sitcp = rst | command_sitcprst_sync;
 	
 	wire TCP_OPEN;
 	wire TCP_CLOSE;
@@ -1205,15 +1205,27 @@ module dragonv5_main(
 		end
 	end
 	
+	reg sitcp_reset_sync_reg;
+	assign command_sitcprst_sync = sitcp_reset_sync_reg;
+	
 	wire	sitcp_reset_finish;
 	reg 	sitcp_reset_finish_reg;
+	assign sitcp_reset_finish = sitcp_reset_finish_reg;
 	
 	always@(posedge clk or posedge rst) begin
 		if(rst) begin
+			sitcp_reset_sync_reg   <= 1'b0;
 			sitcp_reset_finish_reg <= 1'b0;
 		end else begin
+		
+			if(command_sitcprst)begin
+				sitcp_reset_sync_reg <= 1'b1;
+			end else begin
+				sitcp_reset_sync_reg <= 1'b0;
+			end
+		
 			if(SiTCP_RST == 1'b1)begin
-				sitcp_reset_finish_reg <= 1'b0;
+				sitcp_reset_finish_reg <= 1'b1;
 			end else begin
 				sitcp_reset_finish_reg <= sitcp_reset_finish_reg;
 			end
