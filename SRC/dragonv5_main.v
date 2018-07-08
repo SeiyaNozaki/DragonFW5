@@ -1103,7 +1103,10 @@ module dragonv5_main(
 //SiTCP module
 	wire SiTCP_RST; //reset out from SiTCP
 	wire force_default_sw;
-
+	wire command_sitcprst; //command for reset to SiTCP
+	wire rst_sitcp; 
+	assign rst_sitcp = rst || command_sitcprst;
+	
 	wire TCP_OPEN;
 	wire TCP_CLOSE;
 	wire TCP_TX_FULL;
@@ -1122,7 +1125,8 @@ module dragonv5_main(
 		#(133) // = System clock frequency(MHz)
 	SiTCP(
 		.CLK(clk_133m),	// in	: System Clock >129MHz
-		.RST(rst),	// in	: System reset
+		//.RST(rst),	// in	: System reset
+		.RST(rst_sitcp),	// in	: System reset
 	// Configuration parameters
 		.FORCE_DEFAULTn(force_default_sw),	// in	: Load default parameters
 		.EXT_IP_ADDR(32'd0),	// in	: IP address[31:0]
@@ -1186,16 +1190,33 @@ module dragonv5_main(
 		.RBCP_RD(RBCP_RD[7:0])	// in	: Read data[7:0]
 	);
 
+
 //readout reset
 	wire rst_read;//readout reset
 	reg rst_read_sync;
 	//assign rst_read = rst | ~TCP_OPEN | SiTCP_RST;
 	assign rst_read = rst_read_sync;
+
 	always@(posedge clk or posedge rst) begin
 		if(rst) begin
 			rst_read_sync <= 1'b1;
 		end else begin
 			rst_read_sync <= rst | ~TCP_OPEN | SiTCP_RST | rst_fromextclklocked;
+		end
+	end
+	
+	wire	sitcp_reset_finish;
+	reg 	sitcp_reset_finish_reg;
+	
+	always@(posedge clk or posedge rst) begin
+		if(rst) begin
+			sitcp_reset_finish_reg <= 1'b0;
+		end else begin
+			if(SiTCP_RST == 1'b1)begin
+				sitcp_reset_finish_reg <= 1'b0;
+			end else begin
+				sitcp_reset_finish_reg <= sitcp_reset_finish_reg;
+			end
 		end
 	end
 	
@@ -2844,6 +2865,7 @@ module dragonv5_main(
 		.sramwrite_finish(sramwrite_finish),
 		.sramread_finish(sramread_finish),
 		.adcspi_finish(adcspi_finish),
+		.sitcp_reset_finish(sitcp_reset_finish),
 		
 		// RBCP I/F
 		.RBCP_ACT(RAM_RBCP_ACT),	// in	: Active
@@ -3121,6 +3143,8 @@ module dragonv5_main(
 	assign command_adcspi = (X10 == 8'hFF);
 	assign ADC_SPI_DATA = X11[7:0];
 	assign ADC_SPI_ADDR = {X12[4:0],X13[7:0]};
+	
+	assign command_sitcprst = (X14 == 8'hFF);
 
 	assign TRIGGER_ENABLE = X1E[0];
 	assign X1F[7:0] = {6'd0, TCP_OPEN, BUSY_STATE};

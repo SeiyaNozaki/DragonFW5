@@ -59,6 +59,7 @@ module RBCP_REG_drs(
 	sramwrite_finish, //in
 	sramread_finish, //in
 	adcspi_finish, //in
+	sitcp_reset_finish, //in
 	
 	// RBCP I/F
 	RBCP_ACT,	// in	: Active
@@ -335,6 +336,7 @@ module RBCP_REG_drs(
 	input sramwrite_finish;
 	input sramread_finish;
 	input adcspi_finish;
+	input sitcp_reset_finish;
 
 	input			RBCP_ACT;
 	input[31:0]	RBCP_ADDR;
@@ -1085,6 +1087,7 @@ module RBCP_REG_drs(
 			end else if(regBe[16]) begin
 				regX10Data[7:0] <= regWd[7:0];
 			end
+			
 			if(regBe[17]) begin
 				regX11Data[7:0] <= regWd[7:0];
 			end
@@ -1094,9 +1097,18 @@ module RBCP_REG_drs(
 			if(regBe[19]) begin
 				regX13Data[7:0] <= regWd[7:0];
 			end
-			if(regBe[20]) begin
+			
+			if(regX14Data[7:0]==8'hff) begin
+				if(sitcp_reset_finish == 1'b1) begin
+					regX14Data[7:0] <= 8'd0;
+				end
+			end else if(regBe[20]) begin
 				regX14Data[7:0] <= regWd[7:0];
 			end
+			/*
+			if(regBe[20]) begin
+				regX14Data[7:0] <= regWd[7:0];
+			end*/ 
 			if(regBe[21]) begin
 				regX15Data[7:0] <= regWd[7:0];
 			end
