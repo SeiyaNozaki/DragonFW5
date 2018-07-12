@@ -60,6 +60,7 @@ signal error : std_logic;
 signal eof_done : std_logic;
 signal rst : std_logic;
 signal clk : std_logic;
+signal clk_tmp : std_logic; --Seiya
 signal load : std_logic;
 signal status: std_logic_vector(7 downto 0);
 signal prog_cntr : std_logic_vector (6 downto 0);
@@ -137,7 +138,8 @@ END COMPONENT;
 begin
 
 	status <= "00" & empty &  full & '0' & error & eof_done & rdy;
-	rst <= not rst_FIFO;
+	rst <= not rst_FIFO; 
+	
 	
 	write_enable <= write_enable_fifo and not full;
 	
@@ -146,8 +148,8 @@ begin
 	data_count_fifo3 <= wr_data_count_fifo(7 downto 0);
 	data_count_fifo4 <= "000000" & wr_data_count_fifo(9 downto 8);
 	
-	
-	
+	error_out <= read_enable; --Seiya
+	eof_out <= rdy; --Seiya
 			  
 -------------------------FIFO MAP-----------------------------
 			  
@@ -155,6 +157,8 @@ U1 : usb2jtag_fifo PORT MAP
 		  ( rst => rst_FIFO,
 			 wr_clk => clk,
 			 rd_clk => clk,
+			 --wr_clk => clk_in, --Seiya
+			 --rd_clk => clk, --Seiya
 			 din => data_in,
 			 wr_en => write_enable,
 			 rd_en => read_enable,
@@ -182,13 +186,37 @@ U2: player_nty Port map
 			);
 -------------------------CLK GENERATION-----------------------
 	
-generate_clk: process(clk_in)
-	begin
-		if clk_in'event and clk_in='1' then
-			clk <= not clk_in;
-		end if;
-	end process;
-			
+--Seiya modified
+	clk <= clk_in;
+--generate_clk_tmp: process(clk_in, rst_FIFO)
+--	begin
+--		if rst_FIFO='1' then
+--			clk_tmp <= '0';
+--		elsif clk_in'event and clk_in='1' then
+--			clk_tmp <= not clk_tmp;
+--		end if;
+--	end process;
+
+--		20180625
+--generate_clk: process(clk_in, rst_FIFO)
+--	begin
+--		if rst_FIFO='1' then
+--			clk_tmp <= '0';
+--			clk <= '0';
+--		elsif clk_in'event and clk_in='1' then
+--			clk <= clk_tmp;
+--			clk_tmp <= not clk_tmp;
+--		end if;
+--	end process;
+	
+--generate_clk: process(clk_in)
+--	begin
+--		if clk_in'event and clk_in='1' then
+--			clk <= not clk_in;
+--		end if;
+--	end process;
+	
+	
 ---------------READ_ENABLE AND LOAD_ENABLE PROCESS------------
 enable_read: process(clk)
 	begin
@@ -216,7 +244,7 @@ load_enable: process(clk)
 	empty_fifo <= empty;
 	full_fifo <= full;
 	
-	error_out <= error;
-	eof_out <= eof_done;
+	--error_out <= error; --Seiya
+	--eof_out <= eof_done; --Seiya
 	
 end Behavioral;

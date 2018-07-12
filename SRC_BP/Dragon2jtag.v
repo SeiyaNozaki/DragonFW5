@@ -37,14 +37,14 @@ module Dragon2jtag(
 
 
 FIFO_player U0(
-	.data_in (data_in),
+	.data_in (data_in[7:0]),
 	.rst_fifo (rst_fifo),
 	.clk_in (clk_in),
 	.write_enable_fifo (write_enable_fifo),
 	.full_fifo (full_fifo),
 	.empty_fifo (empty_fifo),
-	.rd_data_count (rd_data_count),
-	.wr_data_count (wr_data_count),
+	.rd_data_count (rd_data_count[9:0]),
+	.wr_data_count (wr_data_count[9:0]),
 	.error_out (error_out),
 	.eof_out (eof_out),
 	.tms (tms),

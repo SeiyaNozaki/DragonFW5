@@ -490,6 +490,10 @@ module dragonv5_main(
 //BP SlowControl
 	wire[31:0] BP_SC_SENDDATA;
 	wire[31:0] BP_SC_READ;
+	wire BP_JTAG_TCK;
+	wire BP_JTAG_TDI;
+	wire BP_JTAG_TMS;
+	wire BP_JTAG_TDO;
 
 `ifdef DIGITAL_TRIG
 	assign RATE_L1OUT = 16'd0;
@@ -2577,7 +2581,8 @@ module dragonv5_main(
 
 	assign RBCP_ACK = SPI_RBCP_ACK | RAM_RBCP_ACK | BPJTAG_RBCP_ACK;
 	//assign RBCP_ACK = SPI_RBCP_ACK | RAM_RBCP_ACK;
-	assign RBCP_RD[7:0] = (SPI_RBCP_ACK ? SPI_RBCP_RD[7:0] : RAM_RBCP_RD[7:0]);
+	assign RBCP_RD[7:0] = (BPJTAG_RBCP_ACK ? BPJTAG_RBCP_RD: (SPI_RBCP_ACK ? SPI_RBCP_RD[7:0] : RAM_RBCP_RD[7:0]));
+	//assign RBCP_RD[7:0] = (SPI_RBCP_ACK ? SPI_RBCP_RD[7:0] : RAM_RBCP_RD[7:0]);
 	assign SPI_PROGRAM_B = ~SPI_PROGRAM;
 	
 	assign CS_M25P16_IF   = (RBCP_ADDR[31:12]==20'd0);
