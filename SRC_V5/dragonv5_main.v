@@ -12,7 +12,7 @@
 `define TESTBP
 
 	`define FIRMWARE_VER 16'h53_00
-	`define FIRMWARE_SUBVER 6'h04
+	`define FIRMWARE_SUBVER 6'h05
 `ifdef ANALOG_TRIG
 	`define FIRMWARE_TRIGGER 2'b00
 `endif
@@ -1212,14 +1212,15 @@ module dragonv5_main(
 	reg sitcp_reset_sync_reg;
 	assign command_sitcprst_sync = sitcp_reset_sync_reg;
 	
-	wire	sitcp_reset_finish;
-	reg 	sitcp_reset_finish_reg;
-	assign sitcp_reset_finish = sitcp_reset_finish_reg;
+	//wire	sitcp_reset_finish;
+	//reg 	sitcp_reset_finish_reg;
+	//assign sitcp_reset_finish = sitcp_reset_finish_reg; //v5_3_00_05
+
 	
-	always@(posedge clk or posedge rst) begin
-		if(rst) begin
+	always@(posedge clk or posedge rst_read) begin //v5_3_00_05 (rst -> rst_read)
+		if(rst_read) begin
 			sitcp_reset_sync_reg   <= 1'b0;
-			sitcp_reset_finish_reg <= 1'b0;
+			//sitcp_reset_finish_reg <= 1'b0;
 		end else begin
 		
 			if(command_sitcprst)begin
@@ -1227,12 +1228,13 @@ module dragonv5_main(
 			end else begin
 				sitcp_reset_sync_reg <= 1'b0;
 			end
-		
+			/* //v5_3_00_05
 			if(SiTCP_RST == 1'b1)begin
 				sitcp_reset_finish_reg <= 1'b1;
 			end else begin
-				sitcp_reset_finish_reg <= sitcp_reset_finish_reg;
+				sitcp_reset_finish_reg <= 1'b0;
 			end
+			*/
 		end
 	end
 	
@@ -2882,7 +2884,9 @@ module dragonv5_main(
 		.sramwrite_finish(sramwrite_finish),
 		.sramread_finish(sramread_finish),
 		.adcspi_finish(adcspi_finish),
-		.sitcp_reset_finish(sitcp_reset_finish),
+		//.sitcp_reset_finish(sitcp_reset_finish), //dv5_3_00_05
+		.sitcp_reset_finish(SiTCP_RST), //dv5_3_00_05
+		
 		
 		// RBCP I/F
 		.RBCP_ACT(RAM_RBCP_ACT),	// in	: Active
@@ -3267,7 +3271,6 @@ module dragonv5_main(
 
 	//--------------------------------------------
 	//BP FPGA firmware reconfiguration
-
 	
 	BP_reconfiguration bp_reconfiguration(
 		.CLK_133m(clk_133m),	// in	: System clock

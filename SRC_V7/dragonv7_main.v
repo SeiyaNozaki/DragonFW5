@@ -11,8 +11,8 @@
 
 `define TESTBP
 
-	`define FIRMWARE_VER 16'h53_00
-	`define FIRMWARE_SUBVER 6'h04
+	`define FIRMWARE_VER 16'h72_00
+	`define FIRMWARE_SUBVER 6'h00
 `ifdef ANALOG_TRIG
 	`define FIRMWARE_TRIGGER 2'b00
 `endif
@@ -56,8 +56,8 @@ module dragonv7_main(
 			 L0_CTR2,
 			 L0_CTR1,
 			 L0_CTR0,
-			 L1_OUT_P,
-			 L1_OUT_N,
+			 //L1_OUT_P, //v5
+			 //L1_OUT_N, //v5
 			 L1_OUT2_P,
 			 L1_OUT2_N,
 			 L1_SC_EN,
@@ -65,8 +65,10 @@ module dragonv7_main(
 			 L1_SC_CLK,
 			 L1_SC_DOUT,
 			 L1_INIT_R,
-			 AN_TRG_OUT_P,
-			 AN_TRG_OUT_N,
+			 //AN_TRG_OUT_P, //v5
+			 //AN_TRG_OUT_N, //v5
+			 AN_TRG_OUT_P1, //v7
+			 AN_TRG_OUT_N1, //v7
 			 TRGL1_P,
 			 TRGL1_N,
 
@@ -132,8 +134,9 @@ module dragonv7_main(
 			 DRS_TAG_H_N,
 			 DRS_TAG_L_P,
 			 DRS_TAG_L_N,
-			 DRS_CAL_P,
-			 DRS_CAL_N,
+			 //DRS_CAL_P, //v5
+			 //DRS_CAL_N, //v5
+			 DRS_TIME_CAL, //v7
 			
 			 AD9222_CLK_P,
 			 AD9222_CLK_N,
@@ -186,7 +189,14 @@ module dragonv7_main(
  			 BP_JTAG_TCK, 
 			 BP_JTAG_TDI, 
 			 BP_JTAG_TMS, 
-			 BP_JTAG_TDO  
+			 BP_JTAG_TDO,
+			 
+			 SDA1,
+			 SCL1,
+			 SDA2,
+			 SCL2,
+			 
+			 TEST_OUT
 			 
 		 );
 	 
@@ -227,8 +237,8 @@ module dragonv7_main(
 	output L0_CTR2;
 	output L0_CTR1;
 	output L0_CTR0;
-	input  L1_OUT_P;
-	input  L1_OUT_N;
+	//input  L1_OUT_P; //v5
+	//input  L1_OUT_N; //v5
 	input  L1_OUT2_P;
 	input  L1_OUT2_N;
 	input  L1_SC_DOUT;
@@ -236,8 +246,10 @@ module dragonv7_main(
 	output L1_SC_DIN;
 	output L1_SC_EN;
 	output L1_INIT_R;
-	output[1:0] AN_TRG_OUT_P;
-	output[1:0] AN_TRG_OUT_N;
+	//output[1:0] AN_TRG_OUT_P; //v5
+	//output[1:0] AN_TRG_OUT_N; //v5
+	output AN_TRG_OUT_P1; //v7
+	output AN_TRG_OUT_N1; //v7
 	input TRGL1_P;
 	input TRGL1_N;
 
@@ -303,8 +315,9 @@ module dragonv7_main(
 	output DRS_TAG_H_N;
 	output DRS_TAG_L_P;
 	output DRS_TAG_L_N;
-	output[7:0] DRS_CAL_P;
-	output[7:0] DRS_CAL_N;
+	//output[7:0] DRS_CAL_P; //v5
+	//output[7:0] DRS_CAL_N; //v5
+	output DRS_TIME_CAL; //v7
 	
 	output AD9222_CLK_P;
 	output AD9222_CLK_N;
@@ -358,6 +371,14 @@ module dragonv7_main(
 	output BP_JTAG_TDI; 
 	output BP_JTAG_TMS; 
 	input  BP_JTAG_TDO;
+	
+	inout SDA1; //v7
+	inout SCL1; //v7
+	inout SDA2; //v7
+	inout SCL2; //v7
+	
+	output[3:0] TEST_OUT; //v7
+	
 	
 //--------------------------------------------
 //genvar 
@@ -477,7 +498,7 @@ module dragonv7_main(
 //ANALOG TRIGGER
 	wire[15:0] RATE_WINDOW;
 	wire[15:0] RATE_WINDOWL1;
-	wire[15:0] RATE_L1OUT;
+	//wire[15:0] RATE_L1OUT; //v5
 	wire[15:0] RATE_L1OUT2;
 	wire[15:0] RATE_TRIGL1;
 	wire[6:0] L0_SC_ADDRESS;
@@ -496,7 +517,7 @@ module dragonv7_main(
 	wire BP_JTAG_TDO;
 
 `ifdef DIGITAL_TRIG
-	assign RATE_L1OUT = 16'd0;
+	//assign RATE_L1OUT = 16'd0; //v5
 	assign RATE_L1OUT2 = 16'd0;
 	assign L0_SC_READ = 24'd0;
 	assign L1_SC_READ = 24'd0;
@@ -863,8 +884,8 @@ module dragonv7_main(
 		 .L0_CTR2(L0_CTR2), 
 		 .L0_CTR1(L0_CTR1), 
 		 .L0_CTR0(L0_CTR0), 
-		 .L1_OUT_P(L1_OUT_P), 
-		 .L1_OUT_N(L1_OUT_N), 
+		 //.L1_OUT_P(L1_OUT_P), //v5
+		 //.L1_OUT_N(L1_OUT_N), //v5
 		 .L1_OUT2_P(L1_OUT2_P), 
 		 .L1_OUT2_N(L1_OUT2_N), 
 		 .L1_SC_DOUT(L1_SC_DOUT), 
@@ -872,8 +893,10 @@ module dragonv7_main(
 		 .L1_SC_DIN(L1_SC_DIN), 
 		 .L1_SC_EN(L1_SC_EN),
 		 .L1_INIT_R(L1_INIT_R),
-		 .TRIG_BPOUT_P(AN_TRG_OUT_P), 
-		 .TRIG_BPOUT_N(AN_TRG_OUT_N), 
+		 //.TRIG_BPOUT_P(AN_TRG_OUT_P), //v5
+		 //.TRIG_BPOUT_N(AN_TRG_OUT_N), //v5
+		 .TRIG_BPOUT_P(AN_TRG_OUT_P1), //v7 
+		 .TRIG_BPOUT_N(AN_TRG_OUT_N1), //v7
 		 .TRIGL1_P(TRGL1_P), 
 		 .TRIGL1_N(TRGL1_N),
 		 .TRIGL1_async(TRIGL1_async),
@@ -882,7 +905,7 @@ module dragonv7_main(
 		 .clk_133m(clk_133m),
 		 .clk_66m(clk),
 		 .rst(rst), 
-		 .l1_out(l1_out), 
+		 //.l1_out(l1_out),  //v5
 		 .l1_out2(l1_out2), 
 		 .trigl1(trigl1), 
 		 .command_l0_sc_write(command_l0_sc_write),
@@ -916,7 +939,7 @@ module dragonv7_main(
 		 
 		 .RATE_WINDOW(RATE_WINDOW),
 		 .RATE_WINDOWL1(RATE_WINDOWL1),
-		 .RATE_L1OUT(RATE_L1OUT),
+		 //.RATE_L1OUT(RATE_L1OUT), //v5
 		 .RATE_L1OUT2(RATE_L1OUT2),
 		 .RATE_TRIGL1(RATE_TRIGL1),
 		 .L0_SC_ADDRESS(L0_SC_ADDRESS),
@@ -1375,6 +1398,8 @@ module dragonv7_main(
 	);
 	
 //DRS_CAL timing calibration
+
+/* //v5
 	wire drs_cal[7:0];
 	//wire drs_tcalsrc;
 	//BUFGMUX TCALMUX(.O(drs_tcalsrc), .I0(clk), .I1(clk_tcal266M), .S(DRS_CLKOUT_ENABLE[2]));		
@@ -1396,23 +1421,23 @@ module dragonv7_main(
 			);
 		end
 	endgenerate
-
+*/
 
 //TRIGGER Check--------------------------------
 	wire drs_trig;
 	wire drs_trig_select;
 	wire drs_trigl0;
 	wire drs_trigl1;
-	wire drs_trigl1out;
+	//wire drs_trigl1out; //v5
 	wire drs_trigl1out2;
 
 	assign drs_trigl0 = |dtrig_trig;
 	assign drs_trigl1 = trigl1;
 `ifdef ANALOG_TRIG
-	assign drs_trigl1out = l1_out;
+	//assign drs_trigl1out = l1_out; //v5
 	assign drs_trigl1out2 = l1_out2;
 `else
-	assign drs_trigl1out = 1'b0;
+	//assign drs_trigl1out = 1'b0; //v5
 	assign drs_trigl1out2 = 1'b0;
 `endif
 
@@ -1447,7 +1472,8 @@ module dragonv7_main(
 
 	assign drs_trig_select = 
 		(TRIGGER_SELECT==8'd0) ? TRIGL1_async : 
-		(TRIGGER_SELECT==8'd1) ? drs_trigl1out :
+		//(TRIGGER_SELECT==8'd1) ? drs_trigl1out : //v5
+		(TRIGGER_SELECT==8'd1) ? drs_trigl1out2 : //v7
 		(TRIGGER_SELECT==8'd2) ? drs_trig_self :
 		(TRIGGER_SELECT==8'd3) ? TESTBP_EXTTRG_async :
 		(TRIGGER_SELECT==8'd4) ? scb_tp_trig_ext :
@@ -2614,6 +2640,79 @@ module dragonv7_main(
 		.SPI_SS        (SPI_SS           )   // out  : Chip select
 	);
 
+
+
+//--------------------------------------------
+//I2C bus line(v7)
+	reg clk_400k; 
+	reg[6:0] clk_400k_cnt;
+
+	always@(posedge clk or posedge rst)begin
+		if(rst)begin
+			clk_400k <= 1'b0;
+		end else begin
+			clk_400k_cnt[6:0] <= clk_400k_cnt[6:0] + 7'd1; 
+			if(clk_400k_cnt[6:0] == 7'd83)begin //400kHz
+				clk_400k <= ~clk_400k;
+				clk_400k_cnt[6:0] <= 7'd0;
+			end
+		end
+	end
+	
+	wire SDA_out;
+	wire SDA_in;
+	wire SCL_out;
+	wire SCL_in;
+	wire i2c_finish;
+	wire i2c_set;
+	wire[6:0] I2C_ADDR;
+	wire[7:0] I2C_CMD;
+	wire i2c_mode;
+	wire i2c_data_num;
+	wire[7:0] I2C_WRITEDATA;
+	wire[15:0] I2C_READDATA;
+	
+	reg regi2c_mode;
+	reg regi2c_data_num;
+	reg clk_stretch;
+	
+	assign SDA1   = (I2C_ADDR == 8'h40)? SDA_out : 1'bz ;
+	assign SCL1   = (I2C_ADDR == 8'h40)? SCL_out : 1'bz ;
+	assign SDA2   = (I2C_ADDR == 8'h40)? 1'bz : SDA_out ;
+	assign SCL2   = (I2C_ADDR == 8'h40)? 1'bz : SCL_out ;
+	assign SDA_in = (I2C_ADDR == 8'h40)? SDA1 : SDA2 ;
+	assign SCL_in = (I2C_ADDR == 8'h40)? SCL1 : SCL2 ;	
+	assign i2c_mode = regi2c_mode;
+	assign i2c_data_num = regi2c_data_num;
+	
+
+	
+	I2C I2C(
+    .CLK           (clk_400k),      //input
+    .RST           (rst),           //input
+    .SDA_out       (SDA_out),       //output
+	 .SDA_in        (SDA_in),        //input
+    .SCL_out       (SCL_out),       //output
+	 .SCL_in        (SCL_in),        //input
+	 .i2c_finish    (i2c_finish),    //output
+	 .i2c_set       (i2c_set),       //input
+	 .I2C_ADDR      (I2C_ADDR),      //input
+	 .I2C_CMD       (I2C_CMD),       //input
+	 .i2c_mode      (i2c_mode),      //input
+	 .i2c_data_num  (i2c_data_num),  //input
+	 .clk_stretch   (clk_stretch),   //input
+	 .I2C_WRITEDATA (I2C_WRITEDATA), //input
+	 .I2C_READDATA  (I2C_READDATA),  //output
+	 .LED_state0    (SDA_state)
+	 );
+	 
+//-------------------------------------------
+//Test Pin(v7)
+	assign TEST_OUT[0] = 1'bz;
+	assign TEST_OUT[1] = 1'bz;
+	assign TEST_OUT[2] = 1'bz;
+	assign TEST_OUT[3] = 1'bz;
+
 //--------------------------------------------
 //RBCP register
 
@@ -2837,6 +2936,16 @@ module dragonv7_main(
 	wire[7:0] XCD;
 	wire[7:0] XCE;
 	wire[7:0] XCF;
+	
+	wire[7:0] XD0; //v7
+	wire[7:0] XD1; //v7
+	wire[7:0] XD2; //v7
+	wire[7:0] XD3; //v7
+	wire[7:0] XD4; //v7
+	wire[7:0] XD5; //v7
+	
+	reg[7:0] regXD4; //v7
+	reg[7:0] regXD5;	//v7
 
 	wire[7:0] XE0;
 	wire[7:0] XE1;
@@ -2883,6 +2992,7 @@ module dragonv7_main(
 		.sramread_finish(sramread_finish),
 		.adcspi_finish(adcspi_finish),
 		.sitcp_reset_finish(sitcp_reset_finish),
+		.i2c_finish(i2c_finish), //v7		
 		
 		// RBCP I/F
 		.RBCP_ACT(RAM_RBCP_ACT),	// in	: Active
@@ -3132,6 +3242,13 @@ module dragonv7_main(
 		.XEEData(XEE[7:0]), //in
 		.XEFData(XEF[7:0]), //in
 		
+		.XD0Data(XD0[7:0]), //v7
+		.XD1Data(XD1[7:0]), //v7
+		.XD2Data(XD2[7:0]), //v7
+		.XD3Data(XD3[7:0]), //v7
+		.XD4Data(XD4[7:0]), //in //v7
+		.XD5Data(XD5[7:0]),  //in //v7
+		
 		.XF0Data(XF0[7:0]), //in
 		.XF1Data(XF1[7:0]), //in
 		.XF2Data(XF2[7:0]), //in
@@ -3193,7 +3310,7 @@ module dragonv7_main(
 	assign command_l1_sc_read = (X46 == 8'hFF);
 	assign command_l1_reset = (X47 == 8'hFF);
 	assign RATE_WINDOWL1 = {X48[7:0],X49[7:0]};
-	assign {X4A[7:0],X4B[7:0]} = RATE_L1OUT;
+	//assign {X4A[7:0],X4B[7:0]} = RATE_L1OUT; //v5
 	assign {X4C[7:0],X4D[7:0]} = RATE_L1OUT2;
 	assign {X4E[7:0],X4F[7:0]} = RATE_TRIGL1;
 	assign L0_SC_ADDRESS = X50[6:0];
@@ -3237,7 +3354,8 @@ module dragonv7_main(
 	assign DRS_CASCADENUM = X9C[7:0];
 	assign DRS_REFCLK_RESET = (X9D == 8'hFF);
 	assign DRS_REFCLK_SELECT = X9E[7:0];
-	assign X9F = {EXTCLK_ISLOCKED ? 8'h01 : 8'h00};
+	//assign X9F = {EXTCLK_ISLOCKED ? 8'h01 : 8'h00}; //v5
+	assign DRS_TIME_CAL = (X9F == 8'hFF); //v7
 	
 	assign command_scb_spisend = (XA0 == 8'hFF);
 	assign command_tp_trig = (XA1 == 8'hFF);
@@ -3251,6 +3369,75 @@ module dragonv7_main(
 	assign SCB_TP_TRIG_WIDTH[15:0] = {XCB[7:0],XCC[7:0]};
 	assign TRIGGER_FREQ_OFFSET[15:0] = {XCD[7:0],XCE[7:0]};
 	assign SCB_TP_CLKSELECT[7:0] = {XCF[7:0]};
+	
+	//i2c(v7) 
+	assign i2c_set = (XD0 == 8'hff);
+	assign I2C_ADDR[6:0] = XD1[6:0];
+	assign I2C_CMD[7:0] = XD2[7:0];
+	assign I2C_WRITEDATA[7:0] = XD2[7:0];
+	assign XD4[7:0] = regXD4[7:0];
+	assign XD5[7:0] = regXD5[7:0];
+	
+	always@(posedge clk or posedge rst)begin
+		if(rst)begin
+			regXD4[7:0]      <= 8'h00;
+			regXD5[7:0]      <= 8'h00;
+			regi2c_mode      <= 1'b0; 
+			regi2c_data_num  <= 1'b0;
+			clk_stretch      <= 1'b0;
+		end else begin
+			if(XD2[7:0] == 8'h00)begin //read temp(reg)
+				regi2c_mode      <= 1'b1;
+				regi2c_data_num  <= 1'b1;
+				regXD4[7:0]      <= {5'b00000,I2C_READDATA[15:13]};
+				regXD5[7:0]      <= I2C_READDATA[12:5];
+				clk_stretch      <= 1'b0;	
+			end else if(XD2[7:0] == 8'hF5 || XD2[7:0] == 8'hF3 || XD2[7:0] == 8'hE0 )begin //read temp/RH(amp)(No Hold Master Mode)
+				regi2c_mode      <= 1'b1;
+				regi2c_data_num  <= 1'b1;
+				regXD4[7:0]      <= I2C_READDATA[15:8];
+				regXD5[7:0]      <= I2C_READDATA[7:0];
+				//regXD4[7:0]      <= {2'b00,I2C_READDATA[15:10]};
+				//regXD5[7:0]      <= I2C_READDATA[9:2];
+				clk_stretch      <= 1'b0;
+
+			end else if(XD2[7:0] == 8'hE5 || XD2[7:0] == 8'hE3 )begin //read temp/RH(amp)(Hold Master Mode)
+				regi2c_mode      <= 1'b1;
+				regi2c_data_num  <= 1'b1;
+				regXD4[7:0]      <= I2C_READDATA[15:8];
+				regXD5[7:0]      <= I2C_READDATA[7:0];
+				clk_stretch      <= 1'b1;
+				
+			end else if(XD2[7:0] == 8'hE6 || XD2[7:0] == 8'h51 )begin //write reg(amp)
+				regi2c_mode      <= 1'b0;
+				regi2c_data_num  <= 1'b1;
+				clk_stretch      <= 1'b0;
+
+			end else if(XD2[7:0] == 8'hE7 || XD2[7:0] == 8'h11 )begin //read reg(amp)
+				regi2c_mode      <= 1'b1;
+				regi2c_data_num  <= 1'b0;
+				regXD4[7:0]      <= 8'h00;
+				regXD5[7:0]      <= I2C_READDATA[7:0];	
+				clk_stretch      <= 1'b0;			
+			
+			end else if(XD2[7:0] == 8'h08 )begin //set internal votage(2.5V)(reg)
+				regi2c_mode      <= 1'b0;
+				regi2c_data_num  <= 1'b0;
+				clk_stretch      <= 1'b0;			
+			
+			end else if(XD2[3:0] == 4'hC)begin //read DC voltage
+			//end else if(XD2[7:0] == 8'h8C || XD2[7:0] == 8'h9C || XD2[7:0] == 8'hAC ||XD2[7:0] == 8'hBC || XD2[7:0] == 8'hCC || XD2[7:0] == 8'hDC || XD2[7:0] == 8'hEC)begin //read DCvol
+				regi2c_mode      <= 1'b1;
+				regi2c_data_num  <= 1'b1;
+				regXD4[7:0]      <= {4'b0000,I2C_READDATA[11:8]};
+				regXD5[7:0]      <= I2C_READDATA[7:0];
+				clk_stretch      <= 1'b0;
+				
+			end
+		end
+	end
+	
+	//FIFO counter
 	
 	assign {XE1[7:0], XE0[7:0]} = {3'd0, dfifo_wr_count[12:0]};
 	assign {XE3[7:0], XE2[7:0]} = {3'd0, dfifo_wr_count[25:13]};
